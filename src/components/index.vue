@@ -1,21 +1,27 @@
 <template>
   <div>
     <h2>vue-日历组件！！！</h2>
-    <pc-calendar></pc-calendar>
+    <pc-date @dateChange="change"></pc-date>
+    <pc-date thime="#1b51ea" @dateChange="change"></pc-date>
     
   </div>
 </template>
 
 <script>
-import pcCalendar from './calendar/pc-calendar.vue';
+import pcDate from './calendar/pc-date.vue';
 export default {
   data () {
     return {
-
+      chooseDate: ''
     }
   },
   components: {
-    pcCalendar
+    pcDate
+  },
+  methods: {
+    change(date){
+      console.log(date);
+    }
   }
 }
 </script>
