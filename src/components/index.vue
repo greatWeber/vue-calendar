@@ -1,14 +1,16 @@
 <template>
   <div>
     <h2>vue-日历组件！！！</h2>
-    <pc-date @dateChange="change"></pc-date>
+    
     <pc-date thime="#1b51ea" @dateChange="change"></pc-date>
+    <pc-time @dateChange="change"></pc-time>
     
   </div>
 </template>
 
 <script>
 import pcDate from './calendar/pc-date.vue';
+import pcTime from './calendar/pc-time.vue';
 export default {
   data () {
     return {
@@ -16,7 +18,8 @@ export default {
     }
   },
   components: {
-    pcDate
+    pcDate,
+    pcTime
   },
   methods: {
     change(date){

@@ -271,13 +271,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@baseColor: #42b983;
-.fade-enter-active, .fade-leave-active {
-	transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to {
-	opacity: 0;
-}
+@import "../../assets/style/common.less";
 .pc-date {
 	position: relative;
 	display: inline-block;
