@@ -2,15 +2,15 @@
 	<section class="pc-time">
 		<label class="time-label">
 			<span>{{label}}</span>
-			<input type="text" class="time-input" placeholder="请输入时间" ref="time">
+			<input type="text" class="time-input" placeholder="请输入时间" ref="time" :value="time" @keyup.stop="changeTime" @focus="isShow=true;" @blur="blurFn">
 		</label>
 
 		<!-- time start -->
-		<transition name="fade">
-			<section class="time-content">
-				<pc-time-column :list="hours"></pc-time-column>
+		<transition name="fade"> 
+			<section class="time-content" v-show="isShow" @click="keepFocus" :style="{borderColor: color}">
+				<pc-time-column :list="hours" :thime="thime" @columnChange="hourChange" ref="hour"></pc-time-column>
 				<p class="line i-b v-m">:</p>
-				<pc-time-column :list="mins"></pc-time-column>
+				<pc-time-column :list="mins" :thime="thime" @columnChange="minChange" ref="min"></pc-time-column>
 			</section>
 		</transition>
 		<!-- time end -->
@@ -26,6 +26,9 @@ export default {
 			type: String,
 			default: '时间:'
 		},
+		chooseTime: {
+			type: String
+		},
 		thime: {
 			type: String,
 			default: "#42b983"
@@ -35,32 +38,39 @@ export default {
 		return {
 			hours: [],
 			mins: [],
-			lock: false,
-			startY: 0,
-			translate: 115,
-			lastPosition: 115,
-			step: 50, //每个span高50px
-			scale: 1.5,
+			hour:'',
+			min: '',
+			isShow: false
 		}
 	},
 	components:{
 		pcTimeColumn
 	},
 	computed: {
-		transform(){
-			return `translateY(${this.translate}px)`;
+		time(){
+			if(this.hour&&this.min){
+				this.$emit('timeChange',`${this.hour}:${this.min}`);
+				return `${this.hour}:${this.min}`;
+				
+			}
+		},
+		color(){
+			if(!this.thime){
+				this.thime = '#42b983'
+			}
+			return this.thime;
 		}
 	},
 
 	created(){
 		let hours=[],mins=[];
 		for(let i=0;i<24;i++){
-			let hour = i< 10 ? '0'+i:i;
+			let hour = i< 10 ? '0'+i:i+'';
 			hours.push(hour);
 		}
 
 		for(let i=0;i<60;i++){
-			let min = i<10?'0'+i:i;
+			let min = i<10?'0'+i:i+'';
 			mins.push(min);
 		}
 
@@ -68,33 +78,42 @@ export default {
 		this.hours = hours;
 		this.mins = mins;
 	},
-	methods: {
-		mouseDown(e){
-			this.lock = true;
-			this.startY = e.pageY;
-		},
-		mouseMove(e){
-			if(!this.lock) return;
-			this.translate = (e.pageY - this.startY)*this.scale+this.lastPosition;
-
-		},
-		mouseUp(e){
-			this.lock = false;
-			console.log(this.translate);
-			this.lastPosition = this.translate;
-			this.adjust();
-		},
-
-		adjust(){
-			if(this.lastPosition>115){
-				this.lastPosition = 115;
-				this.translate = 115; //00的位置
-			}
-
-			
-
+	mounted(){
+		let time = this.chooseTime;
+		let reg = /([0-2][0-9]):([0-5][0-9])/g
+		if(reg.test(time)){
+			this.hour = RegExp.$1;
+			this.min = RegExp.$2;
 		}
-	}
+	},
+	methods: {
+		hourChange(data){
+			this.hour = data;
+		},
+		minChange(data){
+			this.min = data;
+		},
+		changeTime(e){
+			let time = e.target.value;
+			let reg = /([0-2][0-9]):([0-5][0-9])/g
+			if(reg.test(time)){
+				this.$refs.hour.change(RegExp.$1);
+				this.$refs.min.change(RegExp.$2);
+			}
+		},
+		blurFn(e){
+			setTimeout(()=>{
+				if(this.$refs.time != document.activeElement){
+					this.isShow = false;
+				}
+				
+			},200)
+		},
+		keepFocus(e){
+			this.$refs.time.focus();
+		}
+	},
+
 }
 </script>
 
@@ -139,30 +158,6 @@ export default {
 			height: 100%;
 			overflow: hidden;
 			user-select:none;
-
-			&:before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 115px;
-				background: #eee;
-				opacity: 0.8;
-				border-bottom: 1px solid @baseColor;
-			}
-
-			&:after {
-				content: '';
-				position: absolute;
-				left: 0;
-				bottom: 0;
-				width: 100%;
-				height: 115px;
-				background: #eee;
-				opacity: 0.8;
-				border-top: 1px solid @baseColor;
-			}
 
 		}
 

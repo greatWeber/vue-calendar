@@ -3,7 +3,7 @@
     <h2>vue-日历组件！！！</h2>
     
     <pc-date thime="#1b51ea" @dateChange="change"></pc-date>
-    <pc-time @dateChange="change"></pc-time>
+    <pc-time thime="#1b51ea" @dateChange="change" @timeChange="changeTime"></pc-time>
     
   </div>
 </template>
@@ -24,6 +24,9 @@ export default {
   methods: {
     change(date){
       console.log(date);
+    },
+    changeTime(data){
+      console.log(data);
     }
   }
 }

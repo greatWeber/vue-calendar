@@ -1,5 +1,7 @@
 <template>
-	<div class="time-column i-b v-m"  @mousedown.stop="mouseDown" @mousemove.stop="mouseMove" @mouseup.stop="mouseUp">
+	<div class="time-column i-b v-m"  @mousedown.stop="mouseDown" @mousemove.stop="mouseMove" @mouseup.stop="mouseUp" @mouseleave.stop="mouseUp">
+		<div class="column-before" :style="{borderColor:color}"></div>
+		<div class="column-after" :style="{borderColor:color}"></div>
 		<div class="column-wrapper" :style="{transform: transform}">
 			<span class="column-item t-c" v-for="(item, i) in list" @key="i">{{item}}</span>
 		</div>
@@ -13,6 +15,10 @@ export default {
 		list: {
 			type: Array,
 			default: ()=>[]
+		},
+		thime: {
+			type: String,
+			default: '#42b983'
 		}
 	},
 	data(){
@@ -22,12 +28,18 @@ export default {
 			translate: 115,
 			lastPosition: 115,
 			step: 50, //每个span高50px
-			scale: 1.5,
+			scale: 5,
 		}
 	},
 	computed: {
 		transform(){
 			return `translateY(${this.translate}px)`;
+		},
+		color(){
+			if(!this.thime){
+				this.thime = '#42b983'
+			}
+			return this.thime;
 		}
 	},
 	methods: {
@@ -48,24 +60,34 @@ export default {
 		},
 
 		adjust(){
+			let num;
 			let max = (this.list.length-1)*this.step-115;
 			if(this.lastPosition>115){
 				this.lastPosition = 115;
 				this.translate = 115; //00的位置
+				num = 0;
 			}else if(Math.abs(this.lastPosition)>max){
 				this.lastPosition = -max;
 				this.translate = -max; //最后的位置
+				num = this.list.length-1;
 			}else{
-				console.log((115-this.lastPosition)/50);
 				let double = (115-this.lastPosition)/50;
-				let num = parseInt(double);
+				num = parseInt(double);
 				num = double > num+0.5? num+1: num;
 				// console.log(num);
 				this.lastPosition = this.translate = 115 - num*50;
 			}
 
-			
+			this.$emit('columnChange',this.list[num]);
 
+		},
+		change(data){
+			console.log(this.list.indexOf(data));
+			let num = this.list.indexOf(data);
+			if(num !=-1){
+				this.lastPosition = this.translate = 115 - num*50;
+				this.$emit('columnChange',this.list[num]);
+			}
 		}
 	}
 
@@ -81,8 +103,8 @@ export default {
 	overflow: hidden;
 	user-select:none;
 
-	&:before {
-		content: '';
+	.column-before {
+
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -93,8 +115,8 @@ export default {
 		border-bottom: 1px solid @baseColor;
 	}
 
-	&:after {
-		content: '';
+	.column-after {
+	
 		position: absolute;
 		left: 0;
 		bottom: 0;
